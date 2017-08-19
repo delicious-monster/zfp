@@ -26,8 +26,7 @@
    contributors
    versions
    genindex
-
+..
    * :ref:`genindex`
    * :ref:`search`
-..
    tutorial after arrays

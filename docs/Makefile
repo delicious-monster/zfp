@@ -8,8 +8,7 @@ SPHINXPROJ    = zfp
 SOURCEDIR     = source
 BUILDDIR      = build
 
-all:
-	@$(MAKE) html
+all: html
 
 # Put it first so that "make" without argument is like "make help".
 help:
