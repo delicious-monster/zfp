@@ -25,7 +25,6 @@
    directions
    contributors
    versions
-   genindex
 
 ..
    * :ref:`genindex`
