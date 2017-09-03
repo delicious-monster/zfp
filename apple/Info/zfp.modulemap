@@ -1,9 +1,9 @@
 framework module zfp {
-    header "include/zfp.h"
-    header "include/bitstream.h"
-    header "include/zfp/macros.h"
-    header "include/zfp/system.h"
-    header "include/zfp/types.h"
+    header "zfp.h"
+    header "bitstream.h"
+    header "zfp/macros.h"
+    header "zfp/system.h"
+    header "zfp/types.h"
     export *
 }
 

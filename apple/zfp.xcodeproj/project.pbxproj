@@ -33,27 +33,40 @@
 		7F0F17571F58D5AE0014EE8A /* encode3i.c in Sources */ = {isa = PBXBuildFile; fileRef = 7F0F172C1F58D5730014EE8A /* encode3i.c */; };
 		7F0F17581F58D5AE0014EE8A /* encode3l.c in Sources */ = {isa = PBXBuildFile; fileRef = 7F0F17311F58D5730014EE8A /* encode3l.c */; };
 		7F0F17591F58D5AE0014EE8A /* zfp.c in Sources */ = {isa = PBXBuildFile; fileRef = 7F0F172D1F58D5730014EE8A /* zfp.c */; };
-		7F53A7A91F5B9B1B00F1CA37 /* zfp in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F53A7A81F5B9AEF00F1CA37 /* zfp */; };
+		7F24DE3B1F5BD289008470AA /* types.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F0F17191F58D52D0014EE8A /* types.h */; };
+		7F24DE3C1F5BD289008470AA /* macros.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F0F171A1F58D52D0014EE8A /* macros.h */; };
+		7F24DE3D1F5BD289008470AA /* system.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F0F171B1F58D52D0014EE8A /* system.h */; };
 		7FED9F891F5B9D1A00FF7239 /* zfp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FED9F881F5B9D1A00FF7239 /* zfp.swift */; };
 		7FED9F8D1F5BA0DD00FF7239 /* bitstream.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F0F171C1F58D52D0014EE8A /* bitstream.h */; };
 		7FED9F8E1F5BA0DD00FF7239 /* zfp.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7F0F171D1F58D52D0014EE8A /* zfp.h */; };
-		7FED9F901F5BA89100FF7239 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F17191F58D52D0014EE8A /* types.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7FED9F911F5BA89100FF7239 /* macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171A1F58D52D0014EE8A /* macros.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7FED9F921F5BA89100FF7239 /* system.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171B1F58D52D0014EE8A /* system.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7FED9F931F5BA8D300FF7239 /* bitstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171C1F58D52D0014EE8A /* bitstream.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		7FED9F941F5BA8D300FF7239 /* zfp.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171D1F58D52D0014EE8A /* zfp.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		7FED9F901F5BA89100FF7239 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F17191F58D52D0014EE8A /* types.h */; };
+		7FED9F911F5BA89100FF7239 /* macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171A1F58D52D0014EE8A /* macros.h */; };
+		7FED9F921F5BA89100FF7239 /* system.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171B1F58D52D0014EE8A /* system.h */; };
+		7FED9F931F5BA8D300FF7239 /* bitstream.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171C1F58D52D0014EE8A /* bitstream.h */; };
+		7FED9F941F5BA8D300FF7239 /* zfp.h in Headers */ = {isa = PBXBuildFile; fileRef = 7F0F171D1F58D52D0014EE8A /* zfp.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		7F24DE3A1F5BD276008470AA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Headers/zfp;
+			dstSubfolderSpec = 1;
+			files = (
+				7F24DE3B1F5BD289008470AA /* types.h in CopyFiles */,
+				7F24DE3C1F5BD289008470AA /* macros.h in CopyFiles */,
+				7F24DE3D1F5BD289008470AA /* system.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		7F7C62EC1F58E29100A06A42 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 12;
-			dstPath = Headers/include;
+			dstPath = Headers;
 			dstSubfolderSpec = 1;
 			files = (
 				7FED9F8D1F5BA0DD00FF7239 /* bitstream.h in CopyFiles */,
 				7FED9F8E1F5BA0DD00FF7239 /* zfp.h in CopyFiles */,
-				7F53A7A91F5B9B1B00F1CA37 /* zfp in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,7 +116,6 @@
 		7F0F175E1F58DE900014EE8A /* zfp.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = zfp.modulemap; sourceTree = "<group>"; };
 		7F11E00F1F5AB4C4007724EE /* bitstream.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bitstream.c; sourceTree = "<group>"; };
 		7F11E0101F5AB4C4007724EE /* inline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inline.h; sourceTree = "<group>"; };
-		7F53A7A81F5B9AEF00F1CA37 /* zfp */ = {isa = PBXFileReference; lastKnownFileType = folder; path = zfp; sourceTree = "<group>"; };
 		7FED9F881F5B9D1A00FF7239 /* zfp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = zfp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -151,7 +163,6 @@
 			children = (
 				7F0F171C1F58D52D0014EE8A /* bitstream.h */,
 				7F0F171D1F58D52D0014EE8A /* zfp.h */,
-				7F53A7A81F5B9AEF00F1CA37 /* zfp */,
 				7F0F17181F58D52D0014EE8A /* zfp */,
 			);
 			name = include;
@@ -242,6 +253,7 @@
 			buildConfigurationList = 7F0F17141F58D4C40014EE8A /* Build configuration list for PBXNativeTarget "zfp" */;
 			buildPhases = (
 				7F7C62EC1F58E29100A06A42 /* CopyFiles */,
+				7F24DE3A1F5BD276008470AA /* CopyFiles */,
 				7F0F17071F58D4C40014EE8A /* Sources */,
 				7F0F17081F58D4C40014EE8A /* Frameworks */,
 				7F0F17091F58D4C40014EE8A /* Headers */,
