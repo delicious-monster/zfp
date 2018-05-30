@@ -274,7 +274,7 @@
 		7F0F17031F58D4C40014EE8A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = "Delicious Monster";
 				TargetAttributes = {
 					7F0F170B1F58D4C40014EE8A = {
