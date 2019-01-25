@@ -8,41 +8,41 @@
 public extension Sequence where Iterator.Element : BinaryFloatingPoint { // MARK: compressing
 
     // Note: you MUST decompress with the same accuracy, OR write a header now and use it when decompressing.
-    public func compressedWithZFP(accuracy: Double, header: Bool = true) -> [UInt8]? {
+    func compressedWithZFP(accuracy: Double, header: Bool = true) -> [UInt8]? {
         let values = Array(self)
         return ZFPSession.compress1D(values, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
     }
-    public func compressedWithZFP(precision: Int, header: Bool = true) -> [UInt8]? {
+    func compressedWithZFP(precision: Int, header: Bool = true) -> [UInt8]? {
         let values = Array(self)
         return ZFPSession.compress1D(values, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
     }
 
-    public func compressedWithZFP(x: Int, y: Int, accuracy: Double, header: Bool = true) -> [UInt8]? {
+    func compressedWithZFP(x: Int, y: Int, accuracy: Double, header: Bool = true) -> [UInt8]? {
         let values = Array(self)
         return ZFPSession.compress2D(values, x: x, y: y, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
     }
-    public func compressedWithZFP(x: Int, y: Int, precision: Int, header: Bool = true) -> [UInt8]? {
+    func compressedWithZFP(x: Int, y: Int, precision: Int, header: Bool = true) -> [UInt8]? {
         let values = Array(self)
         return ZFPSession.compress2D(values, x: x, y: y, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
     }
 
-    public func compressedWithZFP(x: Int, y: Int, z: Int, accuracy: Double, header: Bool = true) -> [UInt8]? {
+    func compressedWithZFP(x: Int, y: Int, z: Int, accuracy: Double, header: Bool = true) -> [UInt8]? {
         let values = Array(self)
         return ZFPSession.compress3D(values, x: x, y: y, z: z, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
     }
-    public func compressedWithZFP(x: Int, y: Int, z: Int, precision: Int, header: Bool = true) -> [UInt8]? {
+    func compressedWithZFP(x: Int, y: Int, z: Int, precision: Int, header: Bool = true) -> [UInt8]? {
         let values = Array(self)
         return ZFPSession.compress3D(values, x: x, y: y, z: z, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
     }
 }
 
 public extension Sequence where Iterator.Element == UInt8 { // MARK: decompressing
-    public func decompressedFloatsWithZFP() -> [Float]? {
+    func decompressedFloatsWithZFP() -> [Float]? {
         let values = Array(self)
         return ZFPSession.decompressWithHeaderGuts(compressedData: values)
     }
 
-    public func decompressedDoublesWithZFP() -> [Double]? {
+    func decompressedDoublesWithZFP() -> [Double]? {
         let values = Array(self)
         return ZFPSession.decompressWithHeaderGuts(compressedData: values)
     }
