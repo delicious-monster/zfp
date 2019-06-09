@@ -274,7 +274,7 @@
 		7F0F17031F58D4C40014EE8A /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1100;
 				ORGANIZATIONNAME = "Delicious Monster";
 				TargetAttributes = {
 					7F0F170B1F58D4C40014EE8A = {
@@ -290,6 +290,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 7F0F17021F58D4C40014EE8A;
 			productRefGroup = 7F0F170D1F58D4C40014EE8A /* Products */;
