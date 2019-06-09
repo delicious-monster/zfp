@@ -5,7 +5,8 @@
 //  Copyright © 2017 Delicious Monster. All rights reserved.
 //
 
-public extension Sequence where Element : BinaryFloatingPoint { // MARK: compressing
+// MARK: compressing
+public extension Sequence where Element : BinaryFloatingPoint {
 
     // Note: you MUST decompress with the same accuracy, OR write a header now and use it when decompressing.
     func compressedWithZFP(accuracy: Double, header: Bool = true) -> [UInt8]? {
@@ -36,7 +37,8 @@ public extension Sequence where Element : BinaryFloatingPoint { // MARK: compres
     }
 }
 
-public extension Sequence where Element == UInt8 { // MARK: decompressing
+// MARK: decompressing
+public extension Sequence where Element == UInt8 {
     func decompressedFloatsWithZFP() -> [Float]? {
         let values = Array(self)
         return ZFPSession.decompressWithHeaderGuts(compressedData: values)
