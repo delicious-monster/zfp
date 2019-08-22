@@ -116,6 +116,7 @@
 		7F0F175E1F58DE900014EE8A /* zfp.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = zfp.modulemap; sourceTree = "<group>"; };
 		7F11E00F1F5AB4C4007724EE /* bitstream.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = bitstream.c; sourceTree = "<group>"; };
 		7F11E0101F5AB4C4007724EE /* inline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inline.h; sourceTree = "<group>"; };
+		7F60D98F230CAFDE00BF39D3 /* template */ = {isa = PBXFileReference; lastKnownFileType = folder; name = template; path = ../src/template; sourceTree = "<group>"; };
 		7FED9F881F5B9D1A00FF7239 /* zfp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = zfp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -136,6 +137,7 @@
 				7F0F170E1F58D4C40014EE8A /* Info */,
 				7FED9F881F5B9D1A00FF7239 /* zfp.swift */,
 				7F0F17171F58D52D0014EE8A /* include */,
+				7F60D98F230CAFDE00BF39D3 /* template */,
 				7F0F171E1F58D5730014EE8A /* src */,
 				7F0F170D1F58D4C40014EE8A /* Products */,
 			);
