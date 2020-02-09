@@ -118,9 +118,11 @@ public struct ZFPSession {
         zfp_read_header(zfp, &field, ZFP_HEADER_FULL)
 
         var outputBuffer = Array<EitherFloatOrDouble>(repeating: 0, count: zfp_field_size(&field, nil))
-        outputBuffer.withUnsafeMutableBytes { field.data = $0.baseAddress }
-        guard zfp_decompress(zfp, &field) > 0 else { return nil }
-        return outputBuffer
+        let decompressError: Int32 = outputBuffer.withUnsafeMutableBytes {
+            field.data = $0.baseAddress!
+            return zfp_decompress(zfp, &field)
+        }
+        return (decompressError > 0) ? outputBuffer : nil
     }
 
     /*
