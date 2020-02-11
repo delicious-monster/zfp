@@ -7,79 +7,65 @@
 
 // MARK: compressing
 public extension Sequence where Element : BinaryFloatingPoint {
-
     // Note: you MUST decompress with the same accuracy, OR write a header now and use it when decompressing.
     func compressedWithZFP(accuracy: Double, header: Bool = true) -> [UInt8]? {
-        let values = Array(self)
-        return ZFPSession.compress1D(values, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
+        ZFPSession.compress1D(Array(self), setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
     }
     func compressedWithZFP(precision: Int, header: Bool = true) -> [UInt8]? {
-        let values = Array(self)
-        return ZFPSession.compress1D(values, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
+        ZFPSession.compress1D(Array(self), setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
     }
 
     func compressedWithZFP(x: Int, y: Int, accuracy: Double, header: Bool = true) -> [UInt8]? {
-        let values = Array(self)
-        return ZFPSession.compress2D(values, x: x, y: y, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
+        ZFPSession.compress2D(Array(self), x: x, y: y, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
     }
     func compressedWithZFP(x: Int, y: Int, precision: Int, header: Bool = true) -> [UInt8]? {
-        let values = Array(self)
-        return ZFPSession.compress2D(values, x: x, y: y, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
+        ZFPSession.compress2D(Array(self), x: x, y: y, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
     }
 
     func compressedWithZFP(x: Int, y: Int, z: Int, accuracy: Double, header: Bool = true) -> [UInt8]? {
-        let values = Array(self)
-        return ZFPSession.compress3D(values, x: x, y: y, z: z, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
+        ZFPSession.compress3D(Array(self), x: x, y: y, z: z, setParameters: { zfp_stream_set_accuracy($0, accuracy) }, header: header)
     }
     func compressedWithZFP(x: Int, y: Int, z: Int, precision: Int, header: Bool = true) -> [UInt8]? {
-        let values = Array(self)
-        return ZFPSession.compress3D(values, x: x, y: y, z: z, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
+        ZFPSession.compress3D(Array(self), x: x, y: y, z: z, setParameters: { zfp_stream_set_precision($0, uint(precision)) }, header: header)
     }
 }
 
 // MARK: decompressing
 public extension Sequence where Element == UInt8 {
-    func decompressedFloatsWithZFP() -> [Float]? {
-        let values = Array(self)
-        return ZFPSession.decompressWithHeaderGuts(compressedData: values)
-    }
-
-    func decompressedDoublesWithZFP() -> [Double]? {
-        let values = Array(self)
-        return ZFPSession.decompressWithHeaderGuts(compressedData: values)
-    }
+    func decompressedFloatsWithZFP() -> [Float]? { ZFPSession.decompressWithHeaderGuts(compressedData: Array(self)) }
+    func decompressedDoublesWithZFP() -> [Double]? { ZFPSession.decompressWithHeaderGuts(compressedData:  Array(self)) }
 }
 
 
-public struct ZFPSession {
+// MARK: -ZFPSession
+fileprivate struct ZFPSession {
+}
 
-    // MARK: static functions
-
+// MARK: fileprivate static functions
+fileprivate extension ZFPSession {
     // low-level functions, use methods on <Sequence> above
-    fileprivate static func compress1D<EitherFloatOrDouble: FloatingPoint>(_ values: [EitherFloatOrDouble], setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool) -> [UInt8]? {
+    static func compress1D<EitherFloatOrDouble: FloatingPoint>(_ values: [EitherFloatOrDouble], setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool) -> [UInt8]? {
         var copyOnWriteValues = values
         return compressGuts(createFieldPointer: {
             return zfp_field_1d(&copyOnWriteValues, fieldTypeForType(EitherFloatOrDouble.self)!, UInt32(values.count))
         }, setParameters: setParameters, header: header)
     }
 
-    fileprivate static func compress2D<EitherFloatOrDouble: FloatingPoint>(_ values: [EitherFloatOrDouble], x: Int, y: Int, setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool) -> [UInt8]? {
+    static func compress2D<EitherFloatOrDouble: FloatingPoint>(_ values: [EitherFloatOrDouble], x: Int, y: Int, setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool) -> [UInt8]? {
         var copyOnWriteValues = values
         return compressGuts(createFieldPointer: {
             return zfp_field_2d(&copyOnWriteValues, fieldTypeForType(EitherFloatOrDouble.self)!, UInt32(x), UInt32(y))
         }, setParameters: setParameters, header: header)
     }
 
-    fileprivate static func compress3D<EitherFloatOrDouble: FloatingPoint>(_ values: [EitherFloatOrDouble], x: Int, y: Int, z: Int, setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool) -> [UInt8]? {
+    static func compress3D<EitherFloatOrDouble: FloatingPoint>(_ values: [EitherFloatOrDouble], x: Int, y: Int, z: Int, setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool) -> [UInt8]? {
         var copyOnWriteValues = values
         return compressGuts(createFieldPointer: {
             return zfp_field_3d(&copyOnWriteValues, fieldTypeForType(EitherFloatOrDouble.self)!, UInt32(x), UInt32(y), UInt32(z))
         }, setParameters: setParameters, header: header)
     }
 
-
-    // MARK: private
-    private static func compressGuts(createFieldPointer: () -> UnsafeMutablePointer<zfp_field>?, setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool = true) -> [UInt8]? {
+    static func compressGuts(createFieldPointer: () -> UnsafeMutablePointer<zfp_field>?, setParameters: (UnsafeMutablePointer<zfp_stream>) -> (), header: Bool = true) -> [UInt8]? {
         guard let zfp = zfp_stream_open(nil) else { return nil }
         defer { zfp_stream_close(zfp) }
 
@@ -103,7 +89,7 @@ public struct ZFPSession {
         return Array(outputBuffer[0..<zfpsize])
     }
 
-    fileprivate static func decompressWithHeaderGuts<EitherFloatOrDouble: FloatingPoint>(compressedData: [UInt8]) -> [EitherFloatOrDouble]? {
+    static func decompressWithHeaderGuts<EitherFloatOrDouble: FloatingPoint>(compressedData: [UInt8]) -> [EitherFloatOrDouble]? {
         let zfp = zfp_stream_open(nil)
         defer { zfp_stream_close(zfp) }
 
@@ -146,7 +132,7 @@ public struct ZFPSession {
     }
  */
 
-    private static func fieldTypeForType(_ type: Any.Type) -> zfp_type? {
+    static func fieldTypeForType(_ type: Any.Type) -> zfp_type? {
         if type == Float.self {
             return zfp_type_float
         } else if type == Double.self {
