@@ -31,9 +31,9 @@ public extension Sequence where Element : BinaryFloatingPoint {
 }
 
 // MARK: decompressing
-public extension Sequence where Element == UInt8 {
-    func decompressedFloatsWithZFP() -> [Float]? { ZFPSession.decompressWithHeaderGuts(compressedData: Array(self)) }
-    func decompressedDoublesWithZFP() -> [Double]? { ZFPSession.decompressWithHeaderGuts(compressedData:  Array(self)) }
+public extension Collection where Element == UInt8 {
+    func decompressedFloatsWithZFP() -> [Float] { ZFPSession.decompressWithHeaderGuts(compressedData: self) }
+    func decompressedDoublesWithZFP() -> [Double] { ZFPSession.decompressWithHeaderGuts(compressedData: self) }
 }
 
 
@@ -89,27 +89,28 @@ fileprivate extension ZFPSession {
         return Array(outputBuffer[0..<zfpsize])
     }
 
-    static func decompressWithHeaderGuts<EitherFloatOrDouble: FloatingPoint>(compressedData: [UInt8]) -> [EitherFloatOrDouble]? {
-        let zfp = zfp_stream_open(nil)
-        defer { zfp_stream_close(zfp) }
+    static func decompressWithHeaderGuts<EitherFloatOrDouble: FloatingPoint, ByteCollection: Collection>(compressedData: ByteCollection) -> [EitherFloatOrDouble] where ByteCollection.Element == (UInt8) {
+         let zfp = zfp_stream_open(nil)
+         defer { zfp_stream_close(zfp) }
 
-        var buffer = compressedData
+         var mutableData = Array(compressedData)
+         return mutableData.withContiguousMutableStorageIfAvailable { unsafeBufferPointer in
+             let inputStream = stream_open(unsafeBufferPointer.baseAddress, compressedData.count * MemoryLayout<EitherFloatOrDouble>.size)
+             defer { stream_close(inputStream) }
+             zfp_stream_set_bit_stream(zfp, inputStream)
+             zfp_stream_rewind(zfp)
 
-        let inputStream = stream_open(&buffer, buffer.count * MemoryLayout<EitherFloatOrDouble>.size)
-        defer { stream_close(inputStream) }
-        zfp_stream_set_bit_stream(zfp, inputStream)
-        zfp_stream_rewind(zfp)
+             var field = zfp_field()
+             zfp_read_header(zfp, &field, ZFP_HEADER_FULL)
 
-        var field = zfp_field()
-        zfp_read_header(zfp, &field, ZFP_HEADER_FULL)
-
-        var outputBuffer = Array<EitherFloatOrDouble>(repeating: 0, count: zfp_field_size(&field, nil))
-        let decompressError: Int32 = outputBuffer.withUnsafeMutableBytes {
-            field.data = $0.baseAddress!
-            return zfp_decompress(zfp, &field)
-        }
-        return (decompressError > 0) ? outputBuffer : nil
-    }
+             var outputBuffer = Array<EitherFloatOrDouble>(repeating: 0, count: zfp_field_size(&field, nil))
+             let decompressError: Int32 = outputBuffer.withUnsafeMutableBytes {
+                 field.data = $0.baseAddress!
+                 return zfp_decompress(zfp, &field)
+             }
+             return (decompressError > 0) ? outputBuffer : []
+         } ?? []
+     }
 
     /*
     private static func decompressGuts<EitherFloatOrDouble: FloatingPoint>(_ field: inout zfp_field, compressedData: [UInt8], accuracy: Double) -> [EitherFloatOrDouble]? {
