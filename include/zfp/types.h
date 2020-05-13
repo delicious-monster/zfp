@@ -8,7 +8,7 @@ typedef unsigned int uint;
 #if __STDC_VERSION__ >= 199901L
   /* C99: use standard integer types */
   #include <stdint.h>
-  #include <inttypes.h>
+// #include <inttypes.h>
   #define INT64C(x) INT64_C(x)
   #define UINT64C(x) UINT64_C(x)
   #define INT64PRId PRId64
