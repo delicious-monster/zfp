@@ -1,12 +1,14 @@
-#ifndef CACHE_H
-#define CACHE_H
+#ifndef ZFP_CACHE_H
+#define ZFP_CACHE_H
 
 #include "memory.h"
 
-#ifdef CACHE_PROFILE
+#ifdef ZFP_WITH_CACHE_PROFILE
   // maintain stats on hit and miss rates
   #include <iostream>
 #endif
+
+namespace zfp {
 
 // direct-mapped or two-way skew-associative write-back cache
 template <class Line>
@@ -76,7 +78,7 @@ public:
     {
       if (pair.line) {
         uint i;
-        for (i = pair.line - c->line + 1; i <= c->mask && !c->tag[i].used(); i++);
+        for (i = uint(pair.line - c->line) + 1; i <= c->mask && !c->tag[i].used(); i++);
         pair = (i <= c->mask ? Pair(c->line + i, c->tag[i]) : Pair(0, Tag()));
       }
     }
@@ -85,24 +87,39 @@ public:
   };
 
   // allocate cache with at least minsize lines
-  Cache(uint minsize) : tag(0), line(0)
+  Cache(uint minsize = 0) : tag(0), line(0)
   {
     resize(minsize);
-#ifdef CACHE_PROFILE
+#ifdef ZFP_WITH_CACHE_PROFILE
     std::cerr << "cache lines=" << mask + 1 << std::endl;
     hit[0][0] = hit[1][0] = miss[0] = back[0] = 0;
     hit[0][1] = hit[1][1] = miss[1] = back[1] = 0;
 #endif
   }
 
+  // copy constructor--performs a deep copy
+  Cache(const Cache& c) : tag(0), line(0)
+  {
+    deep_copy(c);
+  }
+
+  // destructor
   ~Cache()
   {
-    deallocate(tag);
-    deallocate(line);
-#ifdef CACHE_PROFILE
+    zfp::deallocate_aligned(tag);
+    zfp::deallocate_aligned(line);
+#ifdef ZFP_WITH_CACHE_PROFILE
     std::cerr << "cache R1=" << hit[0][0] << " R2=" << hit[1][0] << " RM=" << miss[0] << " RB=" << back[0]
               <<      " W1=" << hit[0][1] << " W2=" << hit[1][1] << " WM=" << miss[1] << " WB=" << back[1] << std::endl;
 #endif
+  }
+
+  // assignment operator--performs a deep copy
+  Cache& operator=(const Cache& c)
+  {
+    if (this != &c)
+      deep_copy(c);
+    return *this;
   }
 
   // cache size in number of lines
@@ -112,8 +129,8 @@ public:
   void resize(uint minsize)
   {
     for (mask = minsize ? minsize - 1 : 1; mask & (mask + 1); mask |= mask + 1);
-    reallocate(tag, ((size_t)mask + 1) * sizeof(Tag), 0x100);
-    reallocate(line, ((size_t)mask + 1) * sizeof(Line), 0x100);
+    zfp::reallocate_aligned(tag, ((size_t)mask + 1) * sizeof(Tag), 0x100);
+    zfp::reallocate_aligned(line, ((size_t)mask + 1) * sizeof(Line), 0x100);
     clear();
   }
 
@@ -124,7 +141,7 @@ public:
     uint i = primary(x);
     if (tag[i].index() == x)
       return line + i;
-#ifdef CACHE_TWOWAY
+#ifdef ZFP_WITH_CACHE_TWOWAY
     uint j = secondary(x);
     if (tag[j].index() == x)
       return line + j;
@@ -142,19 +159,19 @@ public:
       ptr = line + i;
       if (write)
         tag[i].mark();
-#ifdef CACHE_PROFILE
+#ifdef ZFP_WITH_CACHE_PROFILE
       hit[0][write]++;
 #endif
       return tag[i];
     }
-#ifdef CACHE_TWOWAY
+#ifdef ZFP_WITH_CACHE_TWOWAY
     uint j = secondary(x);
     if (tag[j].index() == x) {
       ptr = line + j;
       if (write)
         tag[j].mark();
-#ifdef CACHE_PROFILE
-      shit[write]++;
+#ifdef ZFP_WITH_CACHE_PROFILE
+      hit[1][write]++;
 #endif
       return tag[j];
     }
@@ -164,7 +181,7 @@ public:
     ptr = line + i;
     Tag t = tag[i];
     tag[i] = Tag(x, write);
-#ifdef CACHE_PROFILE
+#ifdef ZFP_WITH_CACHE_PROFILE
     miss[write]++;
     if (tag[i].dirty())
       back[write]++;
@@ -182,7 +199,7 @@ public:
   // flush cache line
   void flush(const Line* l)
   {
-    uint i = l - line;
+    uint i = uint(l - line);
     tag[i].clear();
   }
 
@@ -190,10 +207,28 @@ public:
   const_iterator first() { return const_iterator(this); }
 
 protected:
+  // perform a deep copy
+  void deep_copy(const Cache& c)
+  {
+    mask = c.mask;
+    zfp::clone_aligned(tag, c.tag, mask + 1, 0x100u);
+    zfp::clone_aligned(line, c.line, mask + 1, 0x100u);
+#ifdef ZFP_WITH_CACHE_PROFILE
+    hit[0][0] = c.hit[0][0];
+    hit[0][1] = c.hit[0][1];
+    hit[1][0] = c.hit[1][0];
+    hit[1][1] = c.hit[1][1];
+    miss[0] = c.miss[0];
+    miss[1] = c.miss[1];
+    back[0] = c.back[0];
+    back[1] = c.back[1];
+#endif
+  }
+
   uint primary(Index x) const { return x & mask; }
   uint secondary(Index x) const
   {
-#ifdef CACHE_FAST_HASH
+#ifdef ZFP_WITH_CACHE_FAST_HASH
     // max entropy hash for 26- to 16-bit mapping (not full avalanche)
     x -= x <<  7;
     x ^= x >> 16;
@@ -214,11 +249,13 @@ protected:
   Index mask; // cache line mask
   Tag* tag;   // cache line tags
   Line* line; // actual decompressed cache lines
-#ifdef CACHE_PROFILE
+#ifdef ZFP_WITH_CACHE_PROFILE
   uint64 hit[2][2]; // number of primary/secondary read/write hits
   uint64 miss[2];   // number of read/write misses
   uint64 back[2];   // number of write-backs due to read/writes
 #endif
 };
+
+}
 
 #endif

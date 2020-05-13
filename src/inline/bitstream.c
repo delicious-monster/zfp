@@ -107,6 +107,9 @@ The following assumptions and restrictions apply:
   #define inline_
 #endif
 
+/* satisfy compiler when args unused */
+#define unused_(x) ((void)(x))
+
 /* bit stream word/buffer type; granularity of stream I/O operations */
 #ifdef BIT_STREAM_WORD_TYPE
   /* may be 8-, 16-, 32-, or 64-bit unsigned integer type */
@@ -127,7 +130,7 @@ struct bitstream {
   word* begin; /* beginning of stream */
   word* end;   /* end of stream (currently unused) */
 #ifdef BIT_STREAM_STRIDED
-  size_t mask;     /* one less the block size in number of words  */
+  size_t mask;     /* one less the block size in number of words */
   ptrdiff_t delta; /* number of words between consecutive blocks */
 #endif
 };
@@ -187,6 +190,7 @@ stream_stride_block(const bitstream* s)
 #ifdef BIT_STREAM_STRIDED
   return s->mask + 1;
 #else
+  unused_(s);
   return 1;
 #endif
 }
@@ -198,6 +202,7 @@ stream_stride_delta(const bitstream* s)
 #ifdef BIT_STREAM_STRIDED
   return s->delta / (s->mask + 1);
 #else
+  unused_(s);
   return 0;
 #endif
 }
@@ -270,7 +275,7 @@ inline_ uint64
 stream_write_bits(bitstream* s, uint64 value, uint n)
 {
   /* append bit string to buffer */
-  s->buffer += value << s->bits;
+  s->buffer += (word)(value << s->bits);
   s->bits += n;
   /* is buffer full? */
   if (s->bits >= wsize) {
@@ -284,7 +289,7 @@ stream_write_bits(bitstream* s, uint64 value, uint n)
       /* assert: 0 <= s->bits <= n */
       stream_write_word(s, s->buffer);
       /* assert: 0 <= n - s->bits < 64 */
-      s->buffer = value >> (n - s->bits);
+      s->buffer = (word)(value >> (n - s->bits));
     } while (sizeof(s->buffer) < sizeof(value) && s->bits >= wsize);
   }
   /* assert: 0 <= s->bits < wsize */
@@ -371,7 +376,7 @@ stream_pad(bitstream* s, uint n)
 inline_ size_t
 stream_align(bitstream* s)
 {
-  size_t bits = s->bits;
+  uint bits = s->bits;
   if (bits)
     stream_skip(s, bits);
   return bits;
@@ -381,10 +386,25 @@ stream_align(bitstream* s)
 inline_ size_t
 stream_flush(bitstream* s)
 {
-  size_t bits = (wsize - s->bits) % wsize;
+  uint bits = (wsize - s->bits) % wsize;
   if (bits)
     stream_pad(s, bits);
   return bits;
+}
+
+/* copy n bits from one bit stream to another */
+inline_ void
+stream_copy(bitstream* dst, bitstream* src, size_t n)
+{
+  while (n > wsize) {
+    word w = (word)stream_read_bits(src, wsize);
+    stream_write_bits(dst, w, wsize);
+    n -= wsize;
+  }
+  if (n) {
+    word w = (word)stream_read_bits(src, (uint)n);
+    stream_write_bits(dst, w, (uint)n);
+  }
 }
 
 #ifdef BIT_STREAM_STRIDED
@@ -405,9 +425,9 @@ stream_set_stride(bitstream* s, size_t block, ptrdiff_t delta)
 inline_ bitstream*
 stream_open(void* buffer, size_t bytes)
 {
-  bitstream* s = malloc(sizeof(bitstream));
+  bitstream* s = (bitstream*)malloc(sizeof(bitstream));
   if (s) {
-    s->begin = buffer;
+    s->begin = (word*)buffer;
     s->end = s->begin + bytes / sizeof(word);
 #ifdef BIT_STREAM_STRIDED
     stream_set_stride(s, 0, 0);
@@ -423,3 +443,15 @@ stream_close(bitstream* s)
 {
   free(s);
 }
+
+/* make a copy of bit stream to shared memory buffer */
+inline_ bitstream*
+stream_clone(const bitstream* s)
+{
+  bitstream* c = (bitstream*)malloc(sizeof(bitstream));
+  if (c)
+    *c = *s;
+  return c;
+}
+
+#undef unused_
